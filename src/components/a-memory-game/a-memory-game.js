@@ -31,6 +31,13 @@ template.innerHTML = `
     text-align: center;
   }
 
+  #mainWrapper {
+    background-color: #487576;
+    padding: 50px;
+    padding-top: 10px;
+    min-width: min-content;
+  }
+
   #startMenu, #resultWrapper, #gridWrapper {
     display: block;
     padding: 15px;
