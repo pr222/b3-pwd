@@ -5,4 +5,5 @@
  * @version 1.0.0
  */
 
-console.log('TODO: Start working on the assignment')
+import './components/some-tiles/'
+import './components/a-memory-game/'
