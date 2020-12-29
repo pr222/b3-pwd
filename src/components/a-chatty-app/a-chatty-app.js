@@ -28,6 +28,19 @@ h2 {
   font-weight: lighter;
 }
 
+.messageContainer {
+  border: 1px dotted;
+  padding: 5px;
+}
+
+.messageContainer h1 {
+  font-size: 1rem;
+}
+
+.messageContainer p, .messageContainer h1 {
+  margin: 0px;
+}
+
 #sendButton {
   background-color: #FFFFFF;
   padding: 15px;
@@ -36,6 +49,7 @@ h2 {
 
 #sentMessages {
   border: 1px solid;
+  padding: 5px;
   min-height: 200px;
 }
 
@@ -105,11 +119,13 @@ customElements.define('a-chatty-app',
       this._nameForm = this.shadowRoot.querySelector('#nameForm')
       this._name = this.shadowRoot.querySelector('#name')
       this._chatArea = this.shadowRoot.querySelector('#chat')
+      this._messageBox = this.shadowRoot.querySelector('#sentMessages')
       this._messageForm = this.shadowRoot.querySelector('#messageForm')
       this._writtenMessage = this.shadowRoot.querySelector('#writtenMessage')
 
       // Bindings for reaching this shadow.
       this._submitName = this._submitName.bind(this)
+      this._message = this._message.bind(this)
       this._sendMessage = this._sendMessage.bind(this)
       this._checkForUser = this._checkForUser.bind(this)
     }
@@ -163,6 +179,22 @@ customElements.define('a-chatty-app',
     //   console.log(`User: ${messageObject.username}`)
     //   console.log(`Type: ${messageObject.type}`)
     //   console.log(`Message: ${messageObject.data}`)
+      console.log(this._messageBox)
+
+      // Create a container for the message.
+      const messageContainer = document.createElement('div')
+      messageContainer.classList.add('messageContainer')
+      this._messageBox.appendChild(messageContainer)
+
+      // Add username to the container.
+      const username = document.createElement('h1')
+      username.textContent = `${messageObject.username} says:`
+      messageContainer.appendChild(username)
+
+      // Add the message to the container.
+      const message = document.createElement('p')
+      message.textContent = `${messageObject.data}`
+      messageContainer.appendChild(message)
     }
 
     /**
@@ -184,14 +216,13 @@ customElements.define('a-chatty-app',
       // Prevent submitting the form.
       event.preventDefault()
 
-      console.log(this._name.value)
+      // Get the value written into the form.
       const user = this._name.value
-      console.log(user)
 
-      // document.cookie = `username=${this._user}`
+      // Save username to local storage.
       localStorage.setItem('chattyAppUser', `${user}`)
 
-      // Hide the form...
+      // Now hide the form...
       this._nameForm.classList.add('hidden')
       // And display the chat.
       this._chatArea.classList.remove('hidden')
