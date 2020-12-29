@@ -7,3 +7,4 @@
 
 import './components/some-tiles/'
 import './components/a-memory-game/'
+import './components/a-chatty-app/'
