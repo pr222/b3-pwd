@@ -15,6 +15,45 @@ template.innerHTML = `
 <style>
 :host {
   display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+#chat {
+  text-align: left;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: lighter;
+}
+
+#sendButton {
+  background-color: #FFFFFF;
+  padding: 15px;
+  float: right;
+}
+
+#sentMessages {
+  border: 1px solid;
+  min-height: 200px;
+}
+
+#messageWrapper {
+  display: flex;
+}
+
+#messageForm {
+  margin-top: 10px;
+}
+
+textarea {
+  width: 100%;
+  margin-right: 2px;
+}
+
+#submitButton {
+  background-color: #FFFFFF;
 }
 
 .hidden {
@@ -22,21 +61,22 @@ template.innerHTML = `
 }
 </style>
 
-<p>A chatty app here!</p>
+<h1>The Chatty App</h1>
 <form id="nameForm" class="hidden">
-    <h1>Choose a username:</h1>
+    <h2>Choose a username:</h2>
     <input type="text" id="name" autofocus autocomplete="off">
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" id="submitButton">
 </form>
 
 <div id="chat">
   <div id="sentMessages"></div>
+
   <form id="messageForm">
     <label for="writtenMessage">Write something in the chat:</label>
-
-    <textarea id="writtenMessage" name="writtenMessage" rows="3" cols="30"></textarea>
-
-    <input type="submit" value="Send">
+    <div id="messageWrapper">
+      <textarea id="writtenMessage" name="writtenMessage" rows="3" cols="30"></textarea>
+      <input type="submit" value="Send" id="sendButton">
+    </div>
   </form>
 </div>
 `
