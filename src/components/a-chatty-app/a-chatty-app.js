@@ -68,7 +68,7 @@ textarea {
     <input type="submit" value="Submit" id="submitButton">
 </form>
 
-<div id="chat">
+<div id="chat" class="hidden">
   <div id="sentMessages"></div>
 
   <form id="messageForm">
@@ -99,13 +99,19 @@ customElements.define('a-chatty-app',
         .appendChild(template.content.cloneNode(true))
 
       // Username
-      this._user = ''
+      // this._user = ''
 
       // Select elements from shadow.
       this._nameForm = this.shadowRoot.querySelector('#nameForm')
+      this._name = this.shadowRoot.querySelector('#name')
+      this._chatArea = this.shadowRoot.querySelector('#chat')
       this._messageForm = this.shadowRoot.querySelector('#messageForm')
+      this._writtenMessage = this.shadowRoot.querySelector('#writtenMessage')
 
       // Bindings for reaching this shadow.
+      this._submitName = this._submitName.bind(this)
+      this._sendMessage = this._sendMessage.bind(this)
+      this._checkForUser = this._checkForUser.bind(this)
     }
 
     /**
@@ -178,10 +184,17 @@ customElements.define('a-chatty-app',
       // Prevent submitting the form.
       event.preventDefault()
 
-      console.log(this.name.value)
-      this._user = this.name.value
+      console.log(this._name.value)
+      const user = this._name.value
+      console.log(user)
 
-      document.cookie = `username=${this._user}`
+      // document.cookie = `username=${this._user}`
+      localStorage.setItem('chattyAppUser', `${user}`)
+
+      // Hide the form...
+      this._nameForm.classList.add('hidden')
+      // And display the chat.
+      this._chatArea.classList.remove('hidden')
     }
 
     /**
@@ -192,23 +205,32 @@ customElements.define('a-chatty-app',
     _sendMessage (event) {
       // Prevent submitting the form.
       event.preventDefault()
-      console.log('message sent')
-      console.log(this.writtenMessage.value)
 
-      // Empty the textfield for next message.
-      this.writtenMessage.value = ''
-      this.writtenMessage.focus()
+      const newMessage = {
+        type: 'message',
+        username: `${localStorage.getItem('chattyAppUser')}`,
+        data: `${this._writtenMessage.value}`
+      }
+
+      console.log(newMessage)
+
+      // Empty the textfield for next message and make it in focus.
+      this._writtenMessage.value = ''
+      this._writtenMessage.focus()
     }
 
     /**
      * Check for existing user.
      */
     _checkForUser () {
-      if (document.cookie) {
-        console.log(document.cookie)
+      const user = localStorage.getItem('chattyAppUser')
+
+      // Is there already a registered user?
+      if (user) {
+        // Display chat area.
+        this._chatArea.classList.remove('hidden')
       } else {
-        console.log('No cookie...')
-        // Display name submission form.
+        // Display name submission form to register new user.
         this._nameForm.classList.remove('hidden')
       }
     }
