@@ -179,17 +179,20 @@ customElements.define('a-chatty-app',
     //   console.log(`User: ${messageObject.username}`)
     //   console.log(`Type: ${messageObject.type}`)
     //   console.log(`Message: ${messageObject.data}`)
-      console.log(this._messageBox)
+
+      // Create a timestamp for the message.
+      let time = new Date()
+      time = time.toLocaleTimeString()
 
       // Create a container for the message.
       const messageContainer = document.createElement('div')
       messageContainer.classList.add('messageContainer')
       this._messageBox.appendChild(messageContainer)
 
-      // Add username to the container.
-      const username = document.createElement('h1')
-      username.textContent = `${messageObject.username} says:`
-      messageContainer.appendChild(username)
+      // Add header to the container with timestamp and username.
+      const header = document.createElement('h1')
+      header.textContent = `[${time}] ${messageObject.username} says:`
+      messageContainer.appendChild(header)
 
       // Add the message to the container.
       const message = document.createElement('p')
@@ -233,7 +236,7 @@ customElements.define('a-chatty-app',
      *
      * @param {Event} event - submit event.
      */
-    _sendMessage (event) {
+    async _sendMessage (event) {
       // Prevent submitting the form.
       event.preventDefault()
 
@@ -244,6 +247,11 @@ customElements.define('a-chatty-app',
       }
 
       console.log(newMessage)
+
+      const messageAsJson = await JSON.stringify(newMessage)
+
+      // Send the message to the socket connection.
+      SOCKET.send(messageAsJson)
 
       // Empty the textfield for next message and make it in focus.
       this._writtenMessage.value = ''
