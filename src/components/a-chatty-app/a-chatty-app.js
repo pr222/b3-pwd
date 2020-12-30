@@ -90,8 +90,9 @@ textarea {
 <h1>The Chatty App</h1>
 <form id="nameForm" class="hidden">
     <h2>Choose a username:</h2>
-    <input type="text" id="name" autofocus autocomplete="off">
+    <input type="text" id="name" autofocus autocomplete="off" required>
     <input type="submit" value="Submit" id="submitButton">
+    <p>Allowed: Max. 10 characters, with numbers and english letters.</p>
 </form>
 
 <div id="chat" class="hidden">
@@ -224,14 +225,35 @@ customElements.define('a-chatty-app',
       // Get the value written into the form.
       const user = this._name.value
 
-      // Save username to local storage.
-      localStorage.setItem('chattyAppUser', `${user}`)
+      let valid
 
-      // Render the app.
-      this._renderApp('chatArea')
+      // Do not accept non-alphanumeric charachters in username.
+      const invalidChars = /\W/g
 
-      // Empty the input field.
-      this._name.value = ''
+      if (invalidChars.test(user)) {
+        valid = false
+        this._name.value = 'Use numbers and letters'
+      } else if (user.length > 10) {
+        valid = false
+        this._name.value = 'Choose max 10 chars'
+      } else {
+        valid = true
+      }
+
+      if (valid) {
+        // Save username to local storage.
+        localStorage.setItem('chattyAppUser', `${user}`)
+
+        // Render the app.
+        this._renderApp('chatArea')
+
+        // Empty the input field.
+        this._name.value = ''
+      } else {
+        // When not valid, reselect box with the changed input value.
+        this._name.focus()
+        this._name.select()
+      }
     }
 
     /**
@@ -271,9 +293,7 @@ customElements.define('a-chatty-app',
     _onclick (event) {
       // Check if "Change username"-button was clicked.
       if (event.target === this._chatArea.querySelector('button')) {
-        console.log('button!')
-        this._nameForm.classList.remove('hidden')
-        this._chatArea.classList.add('hidden')
+        this._renderApp('submitName')
       }
     }
 
@@ -281,6 +301,7 @@ customElements.define('a-chatty-app',
      * Check for existing user.
      */
     _checkForUser () {
+      // Get the latest info from the local storage.
       const user = localStorage.getItem('chattyAppUser')
 
       // Is there already a registered user?
@@ -294,7 +315,8 @@ customElements.define('a-chatty-app',
     }
 
     /**
-     * Render the app.
+     * Render the app, with the new view
+     * of either 'chatArea' or 'submitName'.
      *
      * @param {string} swapTo - What view to render in the app.
      */
@@ -311,23 +333,6 @@ customElements.define('a-chatty-app',
         // Make sure to hide chat area.
         this._chatArea.classList.add('hidden')
       }
-
-      //   // Update information in the upper bar.
-      //   // First, remove previous rendering.
-      //   while (this._upperBar.firstElementChild) {
-      //     this._upperBar.removeChild(this._upperBar.lastChild)
-      //   }
-
-      //   // Add welcoming message.
-      //   const welcome = document.createElement('h2')
-      //   welcome.textContent = `Welcome ${localStorage.getItem('chattyAppUser')}! `
-      //   this._upperBar.appendChild(welcome)
-
-    //   // Add Change username button.
-    //   const button = document.createElement('button')
-    //   button.setAttribute('type', 'button')
-    //   button.textContent = 'Change username'
-    //   this._upperBar.appendChild(button)
     }
 
     /**
