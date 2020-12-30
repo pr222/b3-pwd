@@ -19,15 +19,32 @@ template.innerHTML = `
   text-align: center;
 }
 
-#chat {
-  text-align: left;
-}
-
+/* Submit name styles */ 
 h2 {
   font-size: 1.5rem;
   font-weight: lighter;
 }
 
+/* Chat area styles */
+#chat {
+  text-align: left;
+}
+
+/* Upper bar styles */
+#upperBar {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Container style for sent chat messages */
+#sentMessages {
+  border: 1px solid;
+  padding: 5px;
+  height: 300px;
+  overflow: auto;
+}
+
+/* Styles for individual chat messages */
 .messageContainer {
   border: 1px dotted;
   padding: 5px;
@@ -41,18 +58,7 @@ h2 {
   margin: 0px;
 }
 
-#sendButton {
-  background-color: #FFFFFF;
-  padding: 15px;
-  float: right;
-}
-
-#sentMessages {
-  border: 1px solid;
-  padding: 5px;
-  min-height: 200px;
-}
-
+/* Styles for writing new messages */
 #messageWrapper {
   display: flex;
 }
@@ -66,7 +72,13 @@ textarea {
   margin-right: 2px;
 }
 
-#submitButton {
+/* Button styles */
+#sendButton {
+  padding: 15px;
+  float: right;
+}
+
+#submitButton, #sendButton, button {
   background-color: #FFFFFF;
 }
 
@@ -83,6 +95,10 @@ textarea {
 </form>
 
 <div id="chat" class="hidden">
+  <div id="upperBar">
+    <button type="button">Change username</button>
+  </div>
+
   <div id="sentMessages"></div>
 
   <form id="messageForm">
@@ -112,13 +128,11 @@ customElements.define('a-chatty-app',
       this.attachShadow({ mode: 'open' })
         .appendChild(template.content.cloneNode(true))
 
-      // Username
-      // this._user = ''
-
       // Select elements from shadow.
       this._nameForm = this.shadowRoot.querySelector('#nameForm')
       this._name = this.shadowRoot.querySelector('#name')
       this._chatArea = this.shadowRoot.querySelector('#chat')
+      // this._upperBar = this.shadowRoot.querySelector('#upperBar')
       this._messageBox = this.shadowRoot.querySelector('#sentMessages')
       this._messageForm = this.shadowRoot.querySelector('#messageForm')
       this._writtenMessage = this.shadowRoot.querySelector('#writtenMessage')
@@ -128,6 +142,7 @@ customElements.define('a-chatty-app',
       this._message = this._message.bind(this)
       this._sendMessage = this._sendMessage.bind(this)
       this._checkForUser = this._checkForUser.bind(this)
+      this._onclick = this._onclick.bind(this)
     }
 
     /**
@@ -143,6 +158,7 @@ customElements.define('a-chatty-app',
       SOCKET.addEventListener('error', this._error)
       this._nameForm.addEventListener('submit', this._submitName)
       this._messageForm.addEventListener('submit', this._sendMessage)
+      this._chatArea.addEventListener('click', this._onclick)
     }
 
     /**
@@ -154,7 +170,8 @@ customElements.define('a-chatty-app',
       SOCKET.removeEventListener('message', this._message)
       SOCKET.removeEventListener('error', this._error)
       this._nameForm.removeEventListener('submit', this._submitName)
-      this._messageForm.addEventListener('submit', this._sendMessage)
+      this._messageForm.removeEventListener('submit', this._sendMessage)
+      this._chatArea.removeEventListener('click', this._onclick)
     }
 
     /**
@@ -167,37 +184,22 @@ customElements.define('a-chatty-app',
     }
 
     /**
-     * Handling message event.
+     * Handling incoming message event.
      *
      * @param {Event} event - a message sent.
      */
     async _message (event) {
+      // Convert message from JSON to an object.
       const messageObject = await JSON.parse(event.data)
 
       console.log(messageObject)
 
-    //   console.log(`User: ${messageObject.username}`)
-    //   console.log(`Type: ${messageObject.type}`)
-    //   console.log(`Message: ${messageObject.data}`)
+      //   console.log(`User: ${messageObject.username}`)
+      //   console.log(`Type: ${messageObject.type}`)
+      //   console.log(`Message: ${messageObject.data}`)
 
-      // Create a timestamp for the message.
-      let time = new Date()
-      time = time.toLocaleTimeString()
-
-      // Create a container for the message.
-      const messageContainer = document.createElement('div')
-      messageContainer.classList.add('messageContainer')
-      this._messageBox.appendChild(messageContainer)
-
-      // Add header to the container with timestamp and username.
-      const header = document.createElement('h1')
-      header.textContent = `[${time}] ${messageObject.username} says:`
-      messageContainer.appendChild(header)
-
-      // Add the message to the container.
-      const message = document.createElement('p')
-      message.textContent = `${messageObject.data}`
-      messageContainer.appendChild(message)
+      // Render the new message into the chat.
+      this._renderMessage(messageObject)
     }
 
     /**
@@ -225,30 +227,33 @@ customElements.define('a-chatty-app',
       // Save username to local storage.
       localStorage.setItem('chattyAppUser', `${user}`)
 
-      // Now hide the form...
-      this._nameForm.classList.add('hidden')
-      // And display the chat.
-      this._chatArea.classList.remove('hidden')
+      // Render the app.
+      this._renderApp('chatArea')
+
+      // Empty the input field.
+      this._name.value = ''
     }
 
     /**
-     * Handle new submitted message.
+     * Handle new submitted message and send it so the socket.
      *
      * @param {Event} event - submit event.
      */
-    async _sendMessage (event) {
+    _sendMessage (event) {
       // Prevent submitting the form.
       event.preventDefault()
 
+      // Prepare an object to send.
       const newMessage = {
         type: 'message',
         username: `${localStorage.getItem('chattyAppUser')}`,
-        data: `${this._writtenMessage.value}`
+        data: `${this._writtenMessage.value}`,
+        channel: 'my, not so secret, channel'
       }
 
       console.log(newMessage)
 
-      const messageAsJson = await JSON.stringify(newMessage)
+      const messageAsJson = JSON.stringify(newMessage)
 
       // Send the message to the socket connection.
       SOCKET.send(messageAsJson)
@@ -256,6 +261,20 @@ customElements.define('a-chatty-app',
       // Empty the textfield for next message and make it in focus.
       this._writtenMessage.value = ''
       this._writtenMessage.focus()
+    }
+
+    /**
+     * Handling click event.
+     *
+     * @param {Event} event - click event.
+     */
+    _onclick (event) {
+      // Check if "Change username"-button was clicked.
+      if (event.target === this._chatArea.querySelector('button')) {
+        console.log('button!')
+        this._nameForm.classList.remove('hidden')
+        this._chatArea.classList.add('hidden')
+      }
     }
 
     /**
@@ -267,11 +286,77 @@ customElements.define('a-chatty-app',
       // Is there already a registered user?
       if (user) {
         // Display chat area.
-        this._chatArea.classList.remove('hidden')
+        this._renderApp('chatArea')
       } else {
-        // Display name submission form to register new user.
-        this._nameForm.classList.remove('hidden')
+        // Display name submission form.
+        this._renderApp('submitName')
       }
+    }
+
+    /**
+     * Render the app.
+     *
+     * @param {string} swapTo - What view to render in the app.
+     */
+    _renderApp (swapTo) {
+      // Choose what view to display.
+      if (swapTo === 'chatArea') {
+        // Display chat area.
+        this._chatArea.classList.remove('hidden')
+        // Make sure to hide name form.
+        this._nameForm.classList.add('hidden')
+      } else if (swapTo === 'submitName') {
+        // Display hide name form.
+        this._nameForm.classList.remove('hidden')
+        // Make sure to hide chat area.
+        this._chatArea.classList.add('hidden')
+      }
+
+      //   // Update information in the upper bar.
+      //   // First, remove previous rendering.
+      //   while (this._upperBar.firstElementChild) {
+      //     this._upperBar.removeChild(this._upperBar.lastChild)
+      //   }
+
+      //   // Add welcoming message.
+      //   const welcome = document.createElement('h2')
+      //   welcome.textContent = `Welcome ${localStorage.getItem('chattyAppUser')}! `
+      //   this._upperBar.appendChild(welcome)
+
+    //   // Add Change username button.
+    //   const button = document.createElement('button')
+    //   button.setAttribute('type', 'button')
+    //   button.textContent = 'Change username'
+    //   this._upperBar.appendChild(button)
+    }
+
+    /**
+     * Render a new message into the chat.
+     *
+     * @param {object} messageObject - The new message to display.
+     */
+    _renderMessage (messageObject) {
+      // Create a timestamp for the message.
+      let time = new Date()
+      time = time.toLocaleTimeString()
+
+      // Create a container for the message.
+      const messageContainer = document.createElement('div')
+      messageContainer.classList.add('messageContainer')
+      this._messageBox.appendChild(messageContainer)
+
+      // Add header to the container with timestamp and username.
+      const header = document.createElement('h1')
+      header.textContent = `[${time}] ${messageObject.username} says:`
+      messageContainer.appendChild(header)
+
+      // Add the message to the container.
+      const message = document.createElement('p')
+      message.textContent = `${messageObject.data}`
+      messageContainer.appendChild(message)
+
+      // Make sure to scroll down automatically if overflow.
+      this._messageBox.scrollTop = this._messageBox.scrollHeight
     }
   }
 )
