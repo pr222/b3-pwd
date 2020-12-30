@@ -103,7 +103,7 @@ textarea {
   <div id="sentMessages"></div>
 
   <form id="messageForm">
-    <label for="writtenMessage">Write something in the chat:</label>
+    <label for="writtenMessage">Write something in the chat (max 500 chars):</label>
     <div id="messageWrapper">
       <textarea id="writtenMessage" name="writtenMessage" rows="3" cols="30"></textarea>
       <input type="submit" value="Send" id="sendButton">
@@ -157,6 +157,7 @@ customElements.define('a-chatty-app',
       SOCKET.addEventListener('open', this._opendedSocket)
       SOCKET.addEventListener('message', this._message)
       SOCKET.addEventListener('error', this._error)
+      SOCKET.addEventListener('close', this._closingSocket)
       this._nameForm.addEventListener('submit', this._submitName)
       this._messageForm.addEventListener('submit', this._sendMessage)
       this._chatArea.addEventListener('click', this._onclick)
@@ -170,6 +171,7 @@ customElements.define('a-chatty-app',
       SOCKET.removeEventListener('open', this._opendedSocket)
       SOCKET.removeEventListener('message', this._message)
       SOCKET.removeEventListener('error', this._error)
+      SOCKET.removeEventListener('close', this._closingSocket)
       this._nameForm.removeEventListener('submit', this._submitName)
       this._messageForm.removeEventListener('submit', this._sendMessage)
       this._chatArea.removeEventListener('click', this._onclick)
@@ -195,22 +197,27 @@ customElements.define('a-chatty-app',
 
       console.log(messageObject)
 
-      //   console.log(`User: ${messageObject.username}`)
-      //   console.log(`Type: ${messageObject.type}`)
-      //   console.log(`Message: ${messageObject.data}`)
-
       // Render the new message into the chat.
       this._renderMessage(messageObject)
     }
 
     /**
-     * Handling error event.
+     * Handling error event from socket.
      *
      * @param {Event} event - an error event.
      */
     _error (event) {
       console.log('An error occured...')
       console.log(event)
+    }
+
+    /**
+     * The web socket is closing.
+     *
+     * @param {Event} event - closing the web socket.
+     */
+    _closingSocket (event) {
+      console.log('The web socket is now closing...')
     }
 
     /**
@@ -265,24 +272,30 @@ customElements.define('a-chatty-app',
       // Prevent submitting the form.
       event.preventDefault()
 
-      // Prepare an object to send.
-      const newMessage = {
-        type: 'message',
-        username: `${localStorage.getItem('chattyAppUser')}`,
-        data: `${this._writtenMessage.value}`,
-        channel: 'my, not so secret, channel'
+      const message = this._writtenMessage.value
+
+      if (message.length > 500) {
+        console.log('Too long message')
+      } else {
+        // Prepare an message object to send.
+        const newMessage = {
+          type: 'message',
+          username: `${localStorage.getItem('chattyAppUser')}`,
+          data: `${message}`,
+          channel: 'my, not so secret, channel'
+        }
+
+        console.log(newMessage)
+        // Convert the message object to JSON
+        const messageAsJson = JSON.stringify(newMessage)
+
+        // Send the message to the socket connection.
+        SOCKET.send(messageAsJson)
+
+        // Empty the textfield for next message and make it in focus.
+        this._writtenMessage.value = ''
+        this._writtenMessage.focus()
       }
-
-      console.log(newMessage)
-
-      const messageAsJson = JSON.stringify(newMessage)
-
-      // Send the message to the socket connection.
-      SOCKET.send(messageAsJson)
-
-      // Empty the textfield for next message and make it in focus.
-      this._writtenMessage.value = ''
-      this._writtenMessage.focus()
     }
 
     /**
