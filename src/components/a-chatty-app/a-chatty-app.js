@@ -6,6 +6,7 @@
  */
 
 const SOCKET = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
+const KEY = 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
 
 /**
  * Define the HTML template
@@ -280,9 +281,10 @@ customElements.define('a-chatty-app',
         // Prepare an message object to send.
         const newMessage = {
           type: 'message',
-          username: `${localStorage.getItem('chattyAppUser')}`,
           data: `${message}`,
-          channel: 'my, not so secret, channel'
+          username: `${localStorage.getItem('chattyAppUser')}`,
+          channel: 'my, not so secret, channel',
+          key: `${KEY}`
         }
 
         console.log(newMessage)
