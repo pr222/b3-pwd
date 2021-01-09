@@ -145,6 +145,7 @@ customElements.define('a-chatty-app',
       this._sendMessage = this._sendMessage.bind(this)
       this._checkForUser = this._checkForUser.bind(this)
       this._onclick = this._onclick.bind(this)
+      this._closingSocket = this._closingSocket.bind(this)
     }
 
     /**
@@ -196,8 +197,6 @@ customElements.define('a-chatty-app',
       // Convert message from JSON to an object.
       const messageObject = await JSON.parse(event.data)
 
-      console.log(messageObject)
-
       // Render the new message into the chat.
       this._renderMessage(messageObject)
     }
@@ -208,8 +207,7 @@ customElements.define('a-chatty-app',
      * @param {Event} event - an error event.
      */
     _error (event) {
-      console.log('An error occured...')
-      console.log(event)
+      console.error(event.message)
     }
 
     /**
@@ -219,6 +217,14 @@ customElements.define('a-chatty-app',
      */
     _closingSocket (event) {
       console.log('The web socket is now closing...')
+
+      // Create a message to display in the chat for the user.
+      const message = {
+        username: 'Chatty App',
+        data: 'Somehow the connection was lost...'
+      }
+
+      this._renderMessage(message)
     }
 
     /**
@@ -287,7 +293,6 @@ customElements.define('a-chatty-app',
           key: `${KEY}`
         }
 
-        console.log(newMessage)
         // Convert the message object to JSON
         const messageAsJson = JSON.stringify(newMessage)
 
