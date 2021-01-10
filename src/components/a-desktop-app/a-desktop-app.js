@@ -16,17 +16,22 @@ const template = document.createElement('template')
 template.innerHTML = `
 <style>
 :host {
-  display: block;
-  padding: 0px;
-  background-color: #EBEBEB;
-  width: 100%;
+    padding: 0px;
+    background-color: #EBEBEB;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
 }
 
 #desktopArea {
-    height: 500px;
+    flex: 1;
+    min-height: calc(100vh - 140px);
+    margin-bottom: auto;
 }
 
 #dock {
+    margin-bottom: auto;
     display: flex;
     justify-content: center;
     background-color: #404040;

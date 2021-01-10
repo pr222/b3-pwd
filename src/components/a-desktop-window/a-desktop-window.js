@@ -7,6 +7,10 @@
 
 const resizeImg = (new URL('img/resize-lines.png', import.meta.url)).href
 const closeButton = (new URL('img/close-window-button.png', import.meta.url)).href
+const X = '300px'
+const Y = '100px'
+const WIDTH = 'max-content'
+const HEIGHT = 'max-content'
 
 /**
  * Define the HTML template
@@ -15,20 +19,18 @@ const template = document.createElement('template')
 template.innerHTML = `
 <style>
 :host {
-  font-family: Arial, Helvetica, sans-serif;
-  display: block;
-  margin: 10px;
-  padding: 0px;
-  border: 2px solid #404040;
-  border-radius: 3px;
-  background-color: #808080;
-  width: max-content;  /************ TEMP **********/
-}
-
-#windowWrapper {
+    font-family: Arial, Helvetica, sans-serif;
     display: block;
-    min-width: min-content;
-    min-height: min-content;
+    margin: 10px;
+    padding: 0px;
+    border: 2px solid #404040;
+    border-radius: 3px;
+    background-color: #808080;
+    width: ${WIDTH};
+    height: ${HEIGHT};
+    position: absolute;
+    left: ${X};
+    top: ${Y};     
 }
 
 #topBar {

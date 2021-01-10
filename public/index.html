@@ -16,19 +16,23 @@
 </head>
 
 <body>
-  <a-desktop-window style="float: left;">
+
+
+  <div></div>
+
+  <a-desktop-app>
+  <a-desktop-window>
     <slot>Chatty App</slot>
     <a-chatty-app slot="an-application"></a-chatty-app>
   </a-desktop-window>
 
-  <a-desktop-window style="float: right;">
+  <a-desktop-window>
     <slot>Memory Game</slot>
     <a-memory-game slot="an-application"></a-memory-game>
   </a-desktop-window>
 
-  <div style="clear: both;"></div>
 
-  <a-desktop-app></a-desktop-app>
+  </a-desktop-app>
 </body>
 
 </html>
