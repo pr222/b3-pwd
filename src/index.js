@@ -5,6 +5,7 @@
  * @version 1.0.0
  */
 
+import './components/a-desktop-app/'
 import './components/some-tiles/'
 import './components/a-memory-game/'
 import './components/a-chatty-app/'

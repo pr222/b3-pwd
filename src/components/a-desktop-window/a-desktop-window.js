@@ -22,6 +22,7 @@ template.innerHTML = `
   border: 2px solid #404040;
   border-radius: 3px;
   background-color: #808080;
+  width: max-content;  /************ TEMP **********/
 }
 
 #windowWrapper {
@@ -34,7 +35,8 @@ template.innerHTML = `
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-color: #404040;    
+    background-color: #404040;
+    cursor: move;  
 }
 
 #topBar h1 {
@@ -53,6 +55,7 @@ template.innerHTML = `
 #close img {
     max-width: 50px;
     margin: 3px;
+    cursor: pointer;
 }
 
 #closeImg:hover, #closeImg:active {
