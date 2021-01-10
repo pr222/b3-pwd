@@ -18,6 +18,8 @@ template.innerHTML = `
   display: block;
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
+  background-color: #EBEBEB;
+  padding: 5px;
 }
 
 /* Submit name styles */ 
@@ -88,7 +90,6 @@ textarea {
 }
 </style>
 
-<h1>The Chatty App</h1>
 <form id="nameForm" class="hidden">
     <h2>Choose a username:</h2>
     <input type="text" id="name" autofocus autocomplete="off" required>

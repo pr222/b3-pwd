@@ -16,9 +16,16 @@
 
 <body>
 
-  <a-chatty-app></a-chatty-app>
-  <a-desktop-window></a-desktop-window>
-  <a-memory-game></a-memory-game>
+  <a-desktop-window>
+    <slot>Chatty App</slot>
+    <a-chatty-app slot="an-application"></a-chatty-app>
+  </a-desktop-window>
+
+
+  <a-desktop-window>
+    <slot>Memory Game</slot>
+    <a-memory-game slot="an-application"></a-memory-game>
+  </a-desktop-window>
 </body>
 
 </html>
