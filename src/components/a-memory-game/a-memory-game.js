@@ -107,8 +107,8 @@ template.innerHTML = `
   }
 
   some-tiles {
-    width: 75px;
-    height: 90px;
+    width: 100px;
+    height: 120px;
   }
 
   some-tiles[disabled] {

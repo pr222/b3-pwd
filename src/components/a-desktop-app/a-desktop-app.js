@@ -19,19 +19,21 @@ template.innerHTML = `
     padding: 0px;
     background-color: #EBEBEB;
     width: 100%;
-    display: flex;
+    display: block;
     flex-direction: column;
 
 }
 
 #desktopArea {
-    flex: 1;
+   /* flex: 1; */
     min-height: calc(100vh - 90px);
-    margin-bottom: auto;
+    max-height: calc(100vh - 90px);
+  /*  margin-bottom: auto; */
+  
 }
 
 #dock {
-    margin-bottom: auto;
+  /*  margin-bottom: auto; */
     display: flex;
     justify-content: center;
     background-color: #404040;

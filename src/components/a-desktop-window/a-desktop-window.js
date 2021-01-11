@@ -51,7 +51,9 @@ template.innerHTML = `
 }
 
 #app {
-    height: 100%;
+/*    height: 100%; */
+    overflow: auto;
+    max-height: calc(100vh - 200px);   
 }
 
 #closeButton {
