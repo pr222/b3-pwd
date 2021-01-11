@@ -26,7 +26,7 @@ template.innerHTML = `
 
 #desktopArea {
     flex: 1;
-    min-height: calc(100vh - 140px);
+    min-height: calc(100vh - 90px);
     margin-bottom: auto;
 }
 
@@ -35,17 +35,40 @@ template.innerHTML = `
     display: flex;
     justify-content: center;
     background-color: #404040;
-    padding: 10px;
+    padding: 5px;
 }
 
-#dock img {
-    max-width: 100px;
-    margin: 10px;
+#tempButton {
+    background-image: url('${tempButton}');
 }
 
-.dockIcon:hover, .dockIcon:active {
+#memoryButton {
+    background-image: url('${memoryButton}');
+}
+
+#chattyButton {
+    background-image: url('${chattyButton}');
+}
+
+.dockIcon {
+    border: none;
+    outline: none;
+    line-height: 0;
+    padding: 0px;
+    margin: 5px;
+    background-size: 70px;
+    height: 70px;
+    width: 70px;
+    opacity: 0.75;      
+}
+
+.dockIcon:active, .dockIcon:hover, .dockIcon:focus {
     outline: 3px solid #a6a6a6;
-    cursor: pointer;
+}
+
+.dockIcon:focus {
+    opacity: 1.0;
+
 }
 </style>
 
@@ -54,9 +77,9 @@ template.innerHTML = `
         <slot></slot>
     </div>
     <div id="dock">
-        <img class="dockIcon" src="${tempButton}" alt="Temp icon">
-        <img class="dockIcon" src="${memoryButton}" alt="Memory App Icon">
-        <img class="dockIcon" src="${chattyButton}" alt="Chat App Icon">
+        <button type="button" id="tempButton" class="dockIcon"></button>
+        <button type="button" id="memoryButton" class="dockIcon"></button>
+        <button type="button" id="chattyButton" class="dockIcon"></button>
     </div>
 </div>
 `

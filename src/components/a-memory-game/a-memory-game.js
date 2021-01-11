@@ -33,8 +33,7 @@ template.innerHTML = `
 
   #mainWrapper {
     background-color: #487576;
-    padding: 50px;
-    padding-top: 10px;
+    padding: 10px;
     min-width: min-content;
   }
 
@@ -44,7 +43,7 @@ template.innerHTML = `
     padding-bottom: 25px;
     text-align: center;
     background-color: cadetblue;
-    box-shadow: 0px 10px 30px;
+  /*  box-shadow: 0px 10px 30px; */
   }
 
   ul {
@@ -108,8 +107,8 @@ template.innerHTML = `
   }
 
   some-tiles {
-    width: 100px;
-    height: 120px;
+    width: 75px;
+    height: 90px;
   }
 
   some-tiles[disabled] {
@@ -123,7 +122,7 @@ template.innerHTML = `
   </style>
 
   <div id="mainWrapper">
-    <h1>MEMORY GAME</h1>
+    <!-- <h1>MEMORY GAME</h1> -->
     <div id="startMenu">
         <h1>Choose a game mode:</h1>
         <ul>

@@ -8,7 +8,7 @@
 const resizeImg = (new URL('img/resize-lines.png', import.meta.url)).href
 const closeButton = (new URL('img/close-window-button.png', import.meta.url)).href
 const X = '300px'
-const Y = '100px'
+const Y = '10px'
 const WIDTH = 'max-content'
 const HEIGHT = 'max-content'
 
@@ -43,7 +43,7 @@ template.innerHTML = `
 
 #topBar h1 {
     color: #a6a6a6;
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: normal;
     margin: 0px;
     margin-right: auto;
@@ -54,18 +54,29 @@ template.innerHTML = `
     height: 100%;
 }
 
-#close img {
-    max-width: 50px;
+#closeButton {
+    border: none;
+    outline: none;
+    line-height: 0;
+    padding: 0px;
+    background-size: 30px;
+    width: 30px;
+    height: 30px;
     margin: 3px;
     cursor: pointer;
 }
 
-#closeImg:hover, #closeImg:active {
+#closeImg:hover, #closeImg:active, #closeButton:focus {
    outline: 3px solid #a6a6a6;
 }
 
+#closeButton {
+    background-image: url('${closeButton}');
+}
+
 #resize {
-    max-width: 25px;
+    max-width: 15px;
+    max-height: 15px;
     padding: 3px;
     border: 3px solid #404040;
     cursor: nwse-resize;
@@ -79,15 +90,18 @@ template.innerHTML = `
 }
 
 img {
-    display: block;
     width: 100%;
 }
 </style>
 
 <div id="windowWrapper">
     <div id="topBar">
-        <h1><slot>Application</slot></h1>
-        <div id="close"><img id="closeImg" src="${closeButton}" alt="A close app window button"></div>
+        <h1>
+            <slot>Application</slot>
+        </h1>
+        <div id="close">
+            <button type="button" id="closeButton"></button>
+        </div>
     </div>
     <div id="app">
         <slot name="an-application">Place an application here...</slot>
