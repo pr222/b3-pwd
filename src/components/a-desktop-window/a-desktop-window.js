@@ -141,16 +141,25 @@ customElements.define('a-desktop-window',
       // Bindings for reaching this shadow.
       this._startDrag = this._startDrag.bind(this)
       this._dragWindow = this._dragWindow.bind(this)
+      this._closeWindow = this._closeWindow.bind(this)
     }
 
-    // TODO: Methods
     /**
      * Called when the element has been insterted into the DOM.
      */
     connectedCallback () {
       this._close.addEventListener('click', this._closeWindow)
-      this._topBar.addEventListener('mousedown', this._startDrag)
-      this._resize.addEventListener('mousedown', this._startResize)
+    // this._topBar.addEventListener('mousedown', this._startDrag)
+    // this._resize.addEventListener('mousedown', this._startResize)
+    }
+
+    /**
+     * Called when the element has been removed from the DOM.
+     */
+    disconnectedCallback () {
+      this._close.removeEventListener('click', this._closeWindow)
+      // this._topBar.removeEventListener('mousedown', this._startDrag)
+      // this._resize.removeEventListener('mousedown', this._startResize)
     }
 
     /**
@@ -160,6 +169,7 @@ customElements.define('a-desktop-window',
      */
     _closeWindow (event) {
       console.log('You clicked on the close-button!')
+      this.dispatchEvent(new CustomEvent('closeWindow', { bubbles: true }))
     }
 
     /**

@@ -112,7 +112,6 @@ customElements.define('a-desktop-app',
       this._openApp = this._openApp.bind(this)
     }
 
-    // TODO: Methods
     /**
      * Called when the element has been insterted into the DOM.
      */
@@ -120,6 +119,19 @@ customElements.define('a-desktop-app',
       this._tempButton.addEventListener('click', this._openApp)
       this._memoryButton.addEventListener('click', this._openApp)
       this._chattyButton.addEventListener('click', this._openApp)
+
+      this.addEventListener('closeWindow', this._closeApp)
+    }
+
+    /**
+     * Called when the element has been removed from the DOM.
+     */
+    disconnectedCallback () {
+      this._tempButton.removeEventListener('click', this._openApp)
+      this._memoryButton.removeEventListener('click', this._openApp)
+      this._chattyButton.removeEventListener('click', this._openApp)
+
+      this.removeEventListener('closeWindow', this._closeApp)
     }
 
     /**
@@ -156,6 +168,15 @@ customElements.define('a-desktop-app',
       const app = document.createElement(`${appElement}`)
       app.setAttribute('slot', 'an-application')
       window.appendChild(app)
+    }
+
+    /**
+     * Close a window.
+     *
+     * @param {Event} event - a custom closeWindow event.
+     */
+    _closeApp (event) {
+      this.removeChild(event.target)
     }
   }
 )
