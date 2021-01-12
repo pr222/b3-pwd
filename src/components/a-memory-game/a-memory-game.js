@@ -29,12 +29,15 @@ template.innerHTML = `
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: #222222;
     text-align: center;
+
   }
 
   #mainWrapper {
     background-color: #487576;
     padding: 10px;
-    min-width: min-content;
+ /*   min-width: min-content; */
+    min-width: 520px;
+    min-height: 605px;    
   }
 
   #startMenu, #resultWrapper, #gridWrapper {

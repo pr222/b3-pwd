@@ -7,8 +7,8 @@
 
 const resizeImg = (new URL('img/resize-lines.png', import.meta.url)).href
 const closeButton = (new URL('img/close-window-button.png', import.meta.url)).href
-const X = '300px'
-const Y = '10px'
+const xLeft = 30
+const yTop = 10
 const WIDTH = 'max-content'
 const HEIGHT = 'max-content'
 
@@ -29,8 +29,8 @@ template.innerHTML = `
     width: ${WIDTH};
     height: ${HEIGHT};
     position: absolute;
-    left: ${X};
-    top: ${Y};     
+  left: ${xLeft}px;
+    top: ${yTop}px;
 }
 
 #topBar {
@@ -134,10 +134,70 @@ customElements.define('a-desktop-window',
         .appendChild(template.content.cloneNode(true))
 
       // Select elements from shadow.
+      this._resize = this.shadowRoot.querySelector('#resize')
+      this._close = this.shadowRoot.querySelector('#closeButton')
+      this._topBar = this.shadowRoot.querySelector('#topBar')
 
       // Bindings for reaching this shadow.
+      this._startDrag = this._startDrag.bind(this)
+      this._dragWindow = this._dragWindow.bind(this)
     }
 
     // TODO: Methods
+    /**
+     * Called when the element has been insterted into the DOM.
+     */
+    connectedCallback () {
+      this._close.addEventListener('click', this._closeWindow)
+      this._topBar.addEventListener('mousedown', this._startDrag)
+      this._resize.addEventListener('mousedown', this._startResize)
+    }
+
+    /**
+     * Close the window.
+     *
+     * @param {Event} event - Close the window.
+     */
+    _closeWindow (event) {
+      console.log('You clicked on the close-button!')
+    }
+
+    /**
+     * Start of drag.
+     *
+     * @param {Event} event - start drag.
+     */
+    _startDrag (event) {
+      event.preventDefault()
+      console.log('You pressed down the mouse for dragging a window...')
+      this._topBar.addEventListener('mousemove', this._dragWindow)
+    }
+
+    /**
+     * The dragging of window.
+     *
+     * @param {Event} event - drag window on mousemove.
+     */
+    _dragWindow (event) {
+      event.preventDefault()
+      console.log('Dragging window...')
+      // const newPosX = xLeft - event.clientX
+      // console.log(newPosX)
+      // xLeft = newPosX
+      // const newPosY = yTop - event.clientY
+      // console.log(newPosY)
+      // yTop = newPosY
+      // = `${}px`
+      //  = `${}px`
+    }
+
+    /**
+     * Start of rezise.
+     *
+     * @param {Event} event - start resizing.
+     */
+    _startResize (event) {
+      console.log('You began resizing by mousedown')
+    }
   }
 )

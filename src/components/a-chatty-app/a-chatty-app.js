@@ -5,7 +5,8 @@
  * @version 1.0.0
  */
 
-const SOCKET = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
+// const SOCKET = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
+let socket
 const KEY = 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
 
 /**
@@ -20,6 +21,8 @@ template.innerHTML = `
   text-align: center;
   background-color: #EBEBEB;
   padding: 5px;
+  min-width: 455px;
+  min-height: 300px;  
 }
 
 /* Submit name styles */ 
@@ -153,14 +156,15 @@ customElements.define('a-chatty-app',
      * Called when the element has been insterted into the DOM.
      */
     connectedCallback () {
+      socket = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
       // Check wether there are already a registered user.
       // If not, start application with a name submit form.
       this._checkForUser()
       // Adding event listeners
-      SOCKET.addEventListener('open', this._opendedSocket)
-      SOCKET.addEventListener('message', this._message)
-      SOCKET.addEventListener('error', this._error)
-      SOCKET.addEventListener('close', this._closingSocket)
+      socket.addEventListener('open', this._opendedSocket)
+      socket.addEventListener('message', this._message)
+      socket.addEventListener('error', this._error)
+      socket.addEventListener('close', this._closingSocket)
       this._nameForm.addEventListener('submit', this._submitName)
       this._messageForm.addEventListener('submit', this._sendMessage)
       this._chatArea.addEventListener('click', this._onclick)
@@ -170,11 +174,12 @@ customElements.define('a-chatty-app',
      * Called when the element has been removed from the DOM.
      */
     disconnectedCallback () {
+      socket.close()
       // Removing event listeners.
-      SOCKET.removeEventListener('open', this._opendedSocket)
-      SOCKET.removeEventListener('message', this._message)
-      SOCKET.removeEventListener('error', this._error)
-      SOCKET.removeEventListener('close', this._closingSocket)
+      socket.removeEventListener('open', this._opendedSocket)
+      socket.removeEventListener('message', this._message)
+      socket.removeEventListener('error', this._error)
+      socket.removeEventListener('close', this._closingSocket)
       this._nameForm.removeEventListener('submit', this._submitName)
       this._messageForm.removeEventListener('submit', this._sendMessage)
       this._chatArea.removeEventListener('click', this._onclick)
@@ -298,7 +303,7 @@ customElements.define('a-chatty-app',
         const messageAsJson = JSON.stringify(newMessage)
 
         // Send the message to the socket connection.
-        SOCKET.send(messageAsJson)
+        socket.send(messageAsJson)
 
         // Empty the textfield for next message and make it in focus.
         this._writtenMessage.value = ''

@@ -104,10 +104,58 @@ customElements.define('a-desktop-app',
         .appendChild(template.content.cloneNode(true))
 
       // Select elements from shadow.
+      this._tempButton = this.shadowRoot.querySelector('#tempButton')
+      this._memoryButton = this.shadowRoot.querySelector('#memoryButton')
+      this._chattyButton = this.shadowRoot.querySelector('#chattyButton')
 
       // Bindings for reaching this shadow.
+      this._openApp = this._openApp.bind(this)
     }
 
     // TODO: Methods
+    /**
+     * Called when the element has been insterted into the DOM.
+     */
+    connectedCallback () {
+      this._tempButton.addEventListener('click', this._openApp)
+      this._memoryButton.addEventListener('click', this._openApp)
+      this._chattyButton.addEventListener('click', this._openApp)
+    }
+
+    /**
+     * Open a application in a new window.
+     *
+     * @param {Event} event - open an application from the dock.
+     */
+    _openApp (event) {
+      // Create a window and add to page.
+      const window = this.appendChild(document.createElement('a-desktop-window'))
+
+      console.log(event.target)
+      console.log(event.target.id)
+
+      let appName, appElement
+
+      if (event.target.id === 'tempButton') {
+        appName = 'A Random App'
+        appElement = 'div'
+      } else if (event.target.id === 'memoryButton') {
+        appName = 'Memory Game'
+        appElement = 'a-memory-game'
+      } else if (event.target.id === 'chattyButton') {
+        appName = 'Chatty App'
+        appElement = 'a-chatty-app'
+      }
+
+      // Create a slot to display title of the app's name.
+      const title = document.createElement('slot')
+      title.textContent = `${appName}`
+      window.appendChild(title)
+
+      // Create the app element and add into window.
+      const app = document.createElement(`${appElement}`)
+      app.setAttribute('slot', 'an-application')
+      window.appendChild(app)
+    }
   }
 )
