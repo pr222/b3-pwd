@@ -72,6 +72,7 @@ template.innerHTML = `
 
 <div id="desktopWrapper">
     <div id="desktopArea">
+        <button type="button" id="fullscreenButton">Fullscreen</button>
         <slot></slot>
     </div>
     <div id="dock">
@@ -100,12 +101,15 @@ customElements.define('a-desktop-app',
         .appendChild(template.content.cloneNode(true))
 
       // Select elements from shadow.
+      this._fullscreenButton = this.shadowRoot.querySelector('#fullscreenButton')
+      this._desktopWrapper = this.shadowRoot.querySelector('#desktopWrapper')
       this._tempButton = this.shadowRoot.querySelector('#tempButton')
       this._memoryButton = this.shadowRoot.querySelector('#memoryButton')
       this._chattyButton = this.shadowRoot.querySelector('#chattyButton')
       this._desktopArea = this.shadowRoot.querySelector('#desktopArea')
 
       // Bindings for reaching this shadow.
+      this._toggleFullscreen = this._toggleFullscreen.bind(this)
       this._openApp = this._openApp.bind(this)
       this._startDrag = this._startDrag.bind(this)
       this._stopDrag = this._stopDrag.bind(this)
@@ -116,6 +120,7 @@ customElements.define('a-desktop-app',
      * Called when the element has been insterted into the DOM.
      */
     connectedCallback () {
+      this._fullscreenButton.addEventListener('click', this._toggleFullscreen)
       this._tempButton.addEventListener('click', this._openApp)
       this._memoryButton.addEventListener('click', this._openApp)
       this._chattyButton.addEventListener('click', this._openApp)
@@ -131,6 +136,7 @@ customElements.define('a-desktop-app',
      * Called when the element has been removed from the DOM.
      */
     disconnectedCallback () {
+      this._fullscreenButton.removeEventListener('click', this._toggleFullscreen)
       this._tempButton.removeEventListener('click', this._openApp)
       this._memoryButton.removeEventListener('click', this._openApp)
       this._chattyButton.removeEventListener('click', this._openApp)
@@ -140,6 +146,37 @@ customElements.define('a-desktop-app',
       this._desktopArea.removeEventListener('startDrag', this._startDrag)
       this._desktopArea.removeEventListener('mousemove', this._dragWindow)
       this._desktopArea.removeEventListener('stopDrag', this._stopDrag)
+    }
+
+    /**
+     * Try going fullscreen.
+     *
+     * @param {Event} event - click on fullscreen button.
+     */
+    async _toggleFullscreen (event) {
+      try {
+        // Default is supported in current Chrome and Firefox.
+        // Check if the request method is present on element.
+        if (this._desktopWrapper.requestFullscreen) {
+          // Act depenting on if fullscreen element is present.
+          if (!document.fullscreenElement) {
+            await this._desktopWrapper.requestFullscreen()
+            console.log('Entered fullscreen with base function')
+          } else {
+            document.exitFullscreen()
+          }
+        // Support for Safari
+        } else if (this._desktopWrapper.webkitRequestFullscreen) {
+          if (!document.webkitFullscreenElement) {
+            await this._desktopWrapper.webkitRequestFullscreen()
+            console.log('Entered fullscreen supported for Safari')
+          } else {
+            document.webkitExitFullscreen()
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
 
     /**

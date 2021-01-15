@@ -5,7 +5,6 @@
  * @version 1.0.0
  */
 
-const resizeImg = (new URL('img/resize-lines.png', import.meta.url)).href
 const closeButton = (new URL('img/close-window-button.png', import.meta.url)).href
 
 /**
@@ -50,7 +49,7 @@ template.innerHTML = `
 
 #app {
     overflow: auto;
-    max-height: calc(100vh - 200px);   
+    max-height: calc(100vh - 200px);
 }
 
 #closeButton {
@@ -73,21 +72,6 @@ template.innerHTML = `
     background-image: url('${closeButton}');
 }
 
-#resize {
-    max-width: 15px;
-    max-height: 15px;
-    padding: 3px;
-    border: 3px solid #404040;
-    cursor: nwse-resize;
-    background-color: #737373;
-}
-
-#bottom {
-    display: flex;
-    justify-content: flex-end;
-    align-content: stretch;
-}
-
 img {
     width: 100%;
 }
@@ -104,9 +88,7 @@ img {
         <slot name="an-application">Place an application here...</slot>
     </div>
     <div id="bottom">
-        <div id="resize">
-            <img src="${resizeImg}" alt="A resize app window button">
-        </div>
+
     </div>
 </div>
 `
@@ -129,7 +111,6 @@ customElements.define('a-desktop-window',
         .appendChild(template.content.cloneNode(true))
 
       // Select elements from shadow.
-      this._resize = this.shadowRoot.querySelector('#resize')
       this._close = this.shadowRoot.querySelector('#closeButton')
       this._topBar = this.shadowRoot.querySelector('#topBar')
       this._appName = this.shadowRoot.querySelector('#appName')
@@ -189,15 +170,6 @@ customElements.define('a-desktop-window',
      */
     _closeWindow (event) {
       this.dispatchEvent(new CustomEvent('closeWindow', { bubbles: true }))
-    }
-
-    /**
-     * Start of rezise.
-     *
-     * @param {Event} event - start resizing.
-     */
-    _startResize (event) {
-      console.log('You began resizing by mousedown')
     }
   }
 )
