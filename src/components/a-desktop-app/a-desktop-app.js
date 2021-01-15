@@ -107,9 +107,14 @@ customElements.define('a-desktop-app',
       this._tempButton = this.shadowRoot.querySelector('#tempButton')
       this._memoryButton = this.shadowRoot.querySelector('#memoryButton')
       this._chattyButton = this.shadowRoot.querySelector('#chattyButton')
+      this._desktopArea = this.shadowRoot.querySelector('#desktopArea')
 
       // Bindings for reaching this shadow.
       this._openApp = this._openApp.bind(this)
+      this._startDrag = this._startDrag.bind(this)
+      this._stopDrag = this._stopDrag.bind(this)
+      this._dragWindow = this._dragWindow.bind(this)
+      this._move = this._move.bind(this)
     }
 
     /**
@@ -121,6 +126,10 @@ customElements.define('a-desktop-app',
       this._chattyButton.addEventListener('click', this._openApp)
 
       this.addEventListener('closeWindow', this._closeApp)
+
+      this._desktopArea.addEventListener('mousedown', this._startDrag)
+      //   this._desktopArea.addEventListener('mousemove', this._dragWindow)
+      this._desktopArea.addEventListener('mouseup', this._stopDrag)
     }
 
     /**
@@ -132,6 +141,10 @@ customElements.define('a-desktop-app',
       this._chattyButton.removeEventListener('click', this._openApp)
 
       this.removeEventListener('closeWindow', this._closeApp)
+
+      this._desktopArea.removeEventListener('startDrag', this._startDrag)
+      //  this._desktopArea.removeEventListener('mousemove', this._dragWindow)
+      this._desktopArea.removeEventListener('stopDrag', this._stopDrag)
     }
 
     /**
@@ -140,12 +153,6 @@ customElements.define('a-desktop-app',
      * @param {Event} event - open an application from the dock.
      */
     _openApp (event) {
-      // Create a window and add to page.
-      const window = this.appendChild(document.createElement('a-desktop-window'))
-
-      console.log(event.target)
-      console.log(event.target.id)
-
       let appName, appElement
 
       if (event.target.id === 'tempButton') {
@@ -159,12 +166,16 @@ customElements.define('a-desktop-app',
         appElement = 'a-chatty-app'
       }
 
-      // Create a slot to display title of the app's name.
-      const title = document.createElement('slot')
-      title.textContent = `${appName}`
-      window.appendChild(title)
+      // Create a window and add to page.
+      const window = this.appendChild(document.createElement('a-desktop-window'))
 
-      // Create the app element and add into window.
+      // Add app name to top bar.
+      window.setAttribute('app-name', `${appName}`)
+
+      // Make it draggable.
+      window.setAttribute('draggable', '')
+
+      // Create the app element and add into named slot in the window.
       const app = document.createElement(`${appElement}`)
       app.setAttribute('slot', 'an-application')
       window.appendChild(app)
@@ -177,6 +188,115 @@ customElements.define('a-desktop-app',
      */
     _closeApp (event) {
       this.removeChild(event.target)
+    }
+
+    /**
+     * Start of drag.
+     *
+     * @param {Event} event - mousedown.
+     */
+    _startDrag (event) {
+      event.preventDefault()
+      console.log(event.target)
+      // console.log(event.composedPath())
+      event.target.setAttribute('dragging', '')
+      //   console.log(event.detail)
+      //   console.log(event.detail.dragging)
+      //   console.log(event.detail.startX)
+      //   console.log(event.detail.startY)
+      //   const alreadyDragging = Array.from(document.querySelectorAll('[dragging]'))
+      //   console.log(alreadyDragging)
+      // event.target.addEventListener('mousemove', this._dragWindow)
+      // startingX = event.clientX - xOffset
+      // startingY = event.clientY - yOffset
+      // console.log(event.path)
+      const currentPath = event.composedPath()
+      console.log(currentPath)
+      console.log(currentPath[0])
+      console.log(currentPath[0].id)
+      // console.log(event.path[0].id)
+      // console.log(event.target.id)
+      if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
+        if (event.target.id !== 'closeButton') {
+          console.log('START DRAG ON DESKTOP')
+          event.target.addEventListener('mousemove', this._dragWindow)
+        // this._desktopArea.addEventListener('mousemove', this._dragWindow)
+        // dragging = true
+        }
+      }
+    }
+
+    /**
+     * Stop dragging.
+     *
+     * @param {Event} event - mouseup.
+     */
+    _stopDrag (event) {
+    //   const alreadyDragging = Array.from(document.querySelectorAll('[dragging]'))
+    //   // console.log(alreadyDragging)
+      // console.log(event.target)
+      //  event.target.removeEventListener('mousemove', this._dragWindow)
+      // console.log('STOP DRAG ON DESKTOP')
+      //   if (event.target.id === 'topBar') {
+      //     console.log('Stop dragging...')
+      //     dragging = false
+      //   }
+      const currentPath = event.composedPath()
+
+      if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
+        // if (event.target.id !== 'closeButton') {
+        console.log('STOP DRAG ON DESKTOP')
+        event.target.setAttribute('draggable', '')
+        event.target.removeEventListener('mousemove', this._dragWindow)
+        // }
+      }
+      //   if (event.path[0].id === 'topBar' || event.target.id === 'title') {
+      //     // if (event.target.id !== 'closeButton') {
+      //     console.log('STOP DRAG ON DESKTOP')
+      //     // dragging = true
+      //     // }
+      //   }
+    }
+
+    /**
+     * The dragging of window.
+     *
+     * @param {Event} event - mousemove.
+     */
+    _dragWindow (event) {
+      // event.preventDefault()
+      // console.log(event.target)
+      if (event.target.hasAttribute('dragging')) {
+        console.log('DRAAAG')
+      } else {
+        console.log('not to drag')
+      }
+
+      //   console.log(event.target)
+
+      //   if (dragging) {
+      //     console.log('Dragging window...')
+      //     newX = event.clientX - startingX
+      //     newY = event.clientY - startingY
+
+      //     xOffset = newX
+      //     yOffset = newY
+
+    //     this._move(newX, newY, event.target)
+    //   }
+    }
+
+    /**
+     * Move?
+     *
+     * @param {*} x -
+     * @param {*} y -
+     * @param {*} element -
+     */
+    _move (x, y, element) {
+      // element.style.transform = `translate3d(${x}px, ${y}px, 0)`
+      this.style.left = `${x}px`
+      this.style.top = `${y}px`
     }
   }
 )
