@@ -7,16 +7,6 @@
 
 const resizeImg = (new URL('img/resize-lines.png', import.meta.url)).href
 const closeButton = (new URL('img/close-window-button.png', import.meta.url)).href
-const xLeft = 30
-const yTop = 10
-const WIDTH = 'max-content'
-const HEIGHT = 'max-content'
-
-let startingX, startingY, newX, newY
-
-let xOffset = 0
-let yOffset = 0
-// let dragging = false
 
 /**
  * Define the HTML template
@@ -32,11 +22,12 @@ template.innerHTML = `
     border: 2px solid #404040;
     border-radius: 3px;
     background-color: #808080;
-    width: ${WIDTH};
-    height: ${HEIGHT};
+    width: 'max-content';
+    height: 'max-content';
     position: absolute;
-    left: ${xLeft}px;
-    top: ${yTop}px;
+  /* Starting position */
+    left: 30px;
+    top: 10px;
 }
 
 #topBar {
@@ -45,7 +36,6 @@ template.innerHTML = `
     align-items: center;
     background-color: #404040;
     cursor: move;
-    height: 30px;
 }
 
 #topBar h1 {
@@ -55,10 +45,10 @@ template.innerHTML = `
     margin: 0px;
     margin-right: auto;
     margin-left: 10px;
+    user-select: none;
 }
 
 #app {
-/*    height: 100%; */
     overflow: auto;
     max-height: calc(100vh - 200px);   
 }
@@ -104,28 +94,12 @@ img {
 </style>
 
 <div id="windowWrapper">
-    <!--
-    <div id="topBar">
-       <h1>
-            <slot>Application</slot>
-        </h1> 
-
-        <h1 id="appName"></h1>
-
-        <div id="close">
-            <button type="button" id="closeButton"></button>
-        </div>  
-    -->
-
     <slot name="topBar" id="topBar">
         <h1 id="appName"></h1>
         <div id="close">
             <button type="button" id="closeButton"></button>
         </div>
     </slot>
-
-
-    </div>
     <div id="app">
         <slot name="an-application">Place an application here...</slot>
     </div>
@@ -161,12 +135,7 @@ customElements.define('a-desktop-window',
       this._appName = this.shadowRoot.querySelector('#appName')
 
       // Bindings for reaching this shadow.
-      this._startDrag = this._startDrag.bind(this)
-      this._stopDrag = this._stopDrag.bind(this)
-      //   this._dragWindow = this._dragWindow.bind(this)
       this._closeWindow = this._closeWindow.bind(this)
-      //   this._move = this._move.bind(this)
-      this.attributeChangedCallback = this.attributeChangedCallback.bind(this)
     }
 
     /**
@@ -204,10 +173,6 @@ customElements.define('a-desktop-window',
      */
     connectedCallback () {
       this._close.addEventListener('click', this._closeWindow)
-      // this._topBar.addEventListener('mousedown', this._startDrag)
-      //   this._topBar.addEventListener('mousemove', this._dragWindow)
-      // this._topBar.addEventListener('mouseup', this._stopDrag)
-    // this._resize.addEventListener('mousedown', this._startResize)
     }
 
     /**
@@ -215,10 +180,6 @@ customElements.define('a-desktop-window',
      */
     disconnectedCallback () {
       this._close.removeEventListener('click', this._closeWindow)
-      // this._topBar.removeEventListener('mousedown', this._startDrag)
-      //   this._topBar.removeEventListener('mousemove', this._dragWindow)
-      // this._topBar.removeEventListener('mouseup', this._stopDrag)
-      // this._resize.removeEventListener('mousedown', this._startResize)
     }
 
     /**
@@ -228,79 +189,6 @@ customElements.define('a-desktop-window',
      */
     _closeWindow (event) {
       this.dispatchEvent(new CustomEvent('closeWindow', { bubbles: true }))
-    }
-
-    /**
-     * Start of drag.
-     *
-     * @param {Event} event - mousedown.
-     */
-    _startDrag (event) {
-    //   event.preventDefault()
-    //   startingX = event.clientX - xOffset
-    //   startingY = event.clientY - yOffset
-
-    //   console.log(event.target.id)
-    //   if (event.target.id === 'topBar' || event.currentTarget.id === 'topBar') {
-    //     if (event.target.id !== 'closeButton') {
-    //       console.log('Start-event initiated...')
-    //       // dragging = true
-    //       this.dispatchEvent(new CustomEvent('startDrag', { bubbles: true }, { detail: { dragging: true, startingX: startingX, startingY } }))
-    //     }
-    //   }
-    }
-
-    /**
-     * Stop dragging.
-     *
-     * @param {Event} event - mouseup.
-     */
-    _stopDrag (event) {
-      //  console.log(event.target)
-      if (event.target.id !== 'closeButton') {
-        console.log('Stop-drag initiated...')
-        // dragging = false
-        this.dispatchEvent(new CustomEvent('stopDrag', { bubbles: true }, { detail: { dragging: false } }))
-      }
-    }
-
-    /**
-     * The dragging of window.
-     *
-     * @param {Event} event - mousemove.
-     */
-    // _dragWindow (event) {
-    //   event.preventDefault()
-
-    //   if (dragging) {
-    //     console.log('Dragging window...')
-    //     newX = event.clientX - startingX
-    //     newY = event.clientY - startingY
-
-    //     xOffset = newX
-    //     yOffset = newY
-
-    //     this._move(newX, newY, event.target)
-    //   }
-
-    //   // const newPosX = xLeft - event.clientX
-    //   // console.log(newPosX)
-    //   // xLeft = newPosX
-    //   // const newPosY = yTop - event.clientY
-    //   // console.log(newPosY)
-    //   // yTop = newPosY
-    //   // = `${}px`
-    //   //  = `${}px`
-    // }
-
-    // _move(x, y, element) {
-    //   // this.style.transform = `translate3d(${x}px, ${y}px, 0)`
-    //   this.style.left = `${x}px`
-    //   this.style.top = `${y}px`
-    // }
-
-    _move (event) {
-      console.log('moving window...')
     }
 
     /**

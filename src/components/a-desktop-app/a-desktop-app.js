@@ -25,15 +25,11 @@ template.innerHTML = `
 }
 
 #desktopArea {
-   /* flex: 1; */
     min-height: calc(100vh - 90px);
     max-height: calc(100vh - 90px);
-  /*  margin-bottom: auto; */
-  
 }
 
 #dock {
-  /*  margin-bottom: auto; */
     display: flex;
     justify-content: center;
     background-color: #404040;
@@ -114,7 +110,6 @@ customElements.define('a-desktop-app',
       this._startDrag = this._startDrag.bind(this)
       this._stopDrag = this._stopDrag.bind(this)
       this._dragWindow = this._dragWindow.bind(this)
-      this._move = this._move.bind(this)
     }
 
     /**
@@ -128,7 +123,7 @@ customElements.define('a-desktop-app',
       this.addEventListener('closeWindow', this._closeApp)
 
       this._desktopArea.addEventListener('mousedown', this._startDrag)
-      //   this._desktopArea.addEventListener('mousemove', this._dragWindow)
+      this._desktopArea.addEventListener('mousemove', this._dragWindow)
       this._desktopArea.addEventListener('mouseup', this._stopDrag)
     }
 
@@ -143,7 +138,7 @@ customElements.define('a-desktop-app',
       this.removeEventListener('closeWindow', this._closeApp)
 
       this._desktopArea.removeEventListener('startDrag', this._startDrag)
-      //  this._desktopArea.removeEventListener('mousemove', this._dragWindow)
+      this._desktopArea.removeEventListener('mousemove', this._dragWindow)
       this._desktopArea.removeEventListener('stopDrag', this._stopDrag)
     }
 
@@ -196,33 +191,16 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mousedown.
      */
     _startDrag (event) {
-      event.preventDefault()
-      console.log(event.target)
-      // console.log(event.composedPath())
-      event.target.setAttribute('dragging', '')
-      //   console.log(event.detail)
-      //   console.log(event.detail.dragging)
-      //   console.log(event.detail.startX)
-      //   console.log(event.detail.startY)
-      //   const alreadyDragging = Array.from(document.querySelectorAll('[dragging]'))
-      //   console.log(alreadyDragging)
-      // event.target.addEventListener('mousemove', this._dragWindow)
       // startingX = event.clientX - xOffset
       // startingY = event.clientY - yOffset
-      // console.log(event.path)
+
+      // Get the current path to find the origin of activated element.
       const currentPath = event.composedPath()
-      console.log(currentPath)
-      console.log(currentPath[0])
-      console.log(currentPath[0].id)
-      // console.log(event.path[0].id)
-      // console.log(event.target.id)
+
       if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
-        if (event.target.id !== 'closeButton') {
-          console.log('START DRAG ON DESKTOP')
-          event.target.addEventListener('mousemove', this._dragWindow)
-        // this._desktopArea.addEventListener('mousemove', this._dragWindow)
-        // dragging = true
-        }
+        // Set dragging attribute on the custom window-element.
+        event.target.setAttribute('dragging', '')
+        console.log('START DRAG ON DESKTOP')
       }
     }
 
@@ -232,30 +210,14 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mouseup.
      */
     _stopDrag (event) {
-    //   const alreadyDragging = Array.from(document.querySelectorAll('[dragging]'))
-    //   // console.log(alreadyDragging)
-      // console.log(event.target)
-      //  event.target.removeEventListener('mousemove', this._dragWindow)
-      // console.log('STOP DRAG ON DESKTOP')
-      //   if (event.target.id === 'topBar') {
-      //     console.log('Stop dragging...')
-      //     dragging = false
-      //   }
+      // Get current path for finding the current originated element.
       const currentPath = event.composedPath()
 
       if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
-        // if (event.target.id !== 'closeButton') {
         console.log('STOP DRAG ON DESKTOP')
+        // Reset dragging status by setting it to draggable.
         event.target.setAttribute('draggable', '')
-        event.target.removeEventListener('mousemove', this._dragWindow)
-        // }
       }
-      //   if (event.path[0].id === 'topBar' || event.target.id === 'title') {
-      //     // if (event.target.id !== 'closeButton') {
-      //     console.log('STOP DRAG ON DESKTOP')
-      //     // dragging = true
-      //     // }
-      //   }
     }
 
     /**
@@ -264,12 +226,10 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mousemove.
      */
     _dragWindow (event) {
-      // event.preventDefault()
       // console.log(event.target)
       if (event.target.hasAttribute('dragging')) {
+        event.preventDefault()
         console.log('DRAAAG')
-      } else {
-        console.log('not to drag')
       }
 
       //   console.log(event.target)
@@ -282,21 +242,16 @@ customElements.define('a-desktop-app',
       //     xOffset = newX
       //     yOffset = newY
 
-    //     this._move(newX, newY, event.target)
-    //   }
-    }
+      //     this._move(newX, newY, event.target)
+      //   }
 
-    /**
-     * Move?
-     *
-     * @param {*} x -
-     * @param {*} y -
-     * @param {*} element -
-     */
-    _move (x, y, element) {
-      // element.style.transform = `translate3d(${x}px, ${y}px, 0)`
-      this.style.left = `${x}px`
-      this.style.top = `${y}px`
+      //   // const newPosX = xLeft - event.clientX
+      //   // console.log(newPosX)
+      //   // xLeft = newPosX
+      //   // const newPosY = yTop - event.clientY
+      //   // console.log(newPosY)
+      //   // yTop = newPosY
+      // }
     }
   }
 )
