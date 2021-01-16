@@ -21,9 +21,10 @@ template.innerHTML = `
     border: 2px solid #404040;
     border-radius: 3px;
     background-color: #808080;
+/*
     width: 'max-content';
     height: 'max-content';
-    position: absolute;
+*/    position: absolute;
   /* Starting position */
     left: 30px;
     top: 10px;

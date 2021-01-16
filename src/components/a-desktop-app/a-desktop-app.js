@@ -9,6 +9,8 @@ const memoryButton = (new URL('img/memory-app-button.png', import.meta.url)).hre
 const chattyButton = (new URL('img/chatty-app-button.png', import.meta.url)).href
 const tempButton = (new URL('img/template-app-button.png', import.meta.url)).href
 
+let xPos, yPos
+
 /**
  * Define the HTML template
  */
@@ -34,6 +36,7 @@ template.innerHTML = `
     justify-content: center;
     background-color: #404040;
     padding: 5px;
+    z-index: 5000;
 }
 
 #tempButton {
@@ -110,6 +113,7 @@ customElements.define('a-desktop-app',
 
       // Bindings for reaching this shadow.
       this._toggleFullscreen = this._toggleFullscreen.bind(this)
+      this._fullscreenChanged = this._fullscreenChanged.bind(this)
       this._openApp = this._openApp.bind(this)
       this._startDrag = this._startDrag.bind(this)
       this._stopDrag = this._stopDrag.bind(this)
@@ -121,6 +125,7 @@ customElements.define('a-desktop-app',
      */
     connectedCallback () {
       this._fullscreenButton.addEventListener('click', this._toggleFullscreen)
+      document.addEventListener('fullscreenchange', this._fullscreenChanged)
       this._tempButton.addEventListener('click', this._openApp)
       this._memoryButton.addEventListener('click', this._openApp)
       this._chattyButton.addEventListener('click', this._openApp)
@@ -137,6 +142,7 @@ customElements.define('a-desktop-app',
      */
     disconnectedCallback () {
       this._fullscreenButton.removeEventListener('click', this._toggleFullscreen)
+      document.removeEventListener('fullscreenchange', this._fullscreenChanged)
       this._tempButton.removeEventListener('click', this._openApp)
       this._memoryButton.removeEventListener('click', this._openApp)
       this._chattyButton.removeEventListener('click', this._openApp)
@@ -156,14 +162,13 @@ customElements.define('a-desktop-app',
     async _toggleFullscreen (event) {
       try {
         // Default is supported in current Chrome and Firefox.
-        // Check if the request method is present on element.
         if (this._desktopWrapper.requestFullscreen) {
-          // Act depenting on if fullscreen element is present.
           if (!document.fullscreenElement) {
             await this._desktopWrapper.requestFullscreen()
             console.log('Entered fullscreen with base function')
           } else {
             document.exitFullscreen()
+            this._resetWindows()
           }
         // Support for Safari
         } else if (this._desktopWrapper.webkitRequestFullscreen) {
@@ -172,10 +177,23 @@ customElements.define('a-desktop-app',
             console.log('Entered fullscreen supported for Safari')
           } else {
             document.webkitExitFullscreen()
+            this._resetWindows()
           }
         }
       } catch (err) {
         console.error(err)
+      }
+    }
+
+    /**
+     * Check if event changed from fullscreen,
+     * reset the app windows in that case.
+     *
+     * @param {Event} event - fullscreenchange
+     */
+    _fullscreenChanged (event) {
+      if (!document.fullscreenElement) {
+        this._resetWindows()
       }
     }
 
@@ -228,9 +246,6 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mousedown.
      */
     _startDrag (event) {
-      // startingX = event.clientX - xOffset
-      // startingY = event.clientY - yOffset
-
       // Get the current path to find the origin of activated element.
       const currentPath = event.composedPath()
 
@@ -238,6 +253,9 @@ customElements.define('a-desktop-app',
         // Set dragging attribute on the custom window-element.
         event.target.setAttribute('dragging', '')
         console.log('START DRAG ON DESKTOP')
+
+        xPos = event.clientX - event.target.style.left.slice(0, -2)
+        yPos = event.clientY - event.target.style.top.slice(0, -2)
       }
     }
 
@@ -247,13 +265,12 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mouseup.
      */
     _stopDrag (event) {
-      // Get current path for finding the current originated element.
-      const currentPath = event.composedPath()
+      const drag = document.querySelector('[dragging]')
 
-      if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
+      if (drag) {
         console.log('STOP DRAG ON DESKTOP')
         // Reset dragging status by setting it to draggable.
-        event.target.setAttribute('draggable', '')
+        drag.setAttribute('draggable', '')
       }
     }
 
@@ -263,32 +280,29 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mousemove.
      */
     _dragWindow (event) {
-      // console.log(event.target)
-      if (event.target.hasAttribute('dragging')) {
+      const drag = document.querySelector('[dragging]')
+
+      if (drag) {
         event.preventDefault()
-        console.log('DRAAAG')
+
+        const currentX = event.clientX - xPos
+        const currentY = event.clientY - yPos
+
+        drag.style.left = `${currentX}px`
+        drag.style.top = `${currentY}px`
       }
+    }
 
-      //   console.log(event.target)
+    /**
+     * Resets the app windows when leaving fullscreen.
+     */
+    _resetWindows () {
+      const windowApps = document.querySelectorAll('[draggable]')
 
-      //   if (dragging) {
-      //     console.log('Dragging window...')
-      //     newX = event.clientX - startingX
-      //     newY = event.clientY - startingY
-
-      //     xOffset = newX
-      //     yOffset = newY
-
-      //     this._move(newX, newY, event.target)
-      //   }
-
-      //   // const newPosX = xLeft - event.clientX
-      //   // console.log(newPosX)
-      //   // xLeft = newPosX
-      //   // const newPosY = yTop - event.clientY
-      //   // console.log(newPosY)
-      //   // yTop = newPosY
-      // }
+      for (const windowApp of windowApps) {
+        windowApp.style.left = '40px'
+        windowApp.style.top = '10px'
+      }
     }
   }
 )
