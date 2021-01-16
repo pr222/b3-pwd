@@ -29,13 +29,11 @@ template.innerHTML = `
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: #222222;
     text-align: center;
-
   }
 
   #mainWrapper {
     background-color: #487576;
     padding: 10px;
- /*   min-width: min-content; */
     min-width: 520px;
     min-height: 605px;    
   }
@@ -46,7 +44,6 @@ template.innerHTML = `
     padding-bottom: 25px;
     text-align: center;
     background-color: cadetblue;
-  /*  box-shadow: 0px 10px 30px; */
   }
 
   ul {
@@ -125,7 +122,6 @@ template.innerHTML = `
   </style>
 
   <div id="mainWrapper">
-    <!-- <h1>MEMORY GAME</h1> -->
     <div id="startMenu">
         <h1>Choose a game mode:</h1>
         <ul>

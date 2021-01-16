@@ -300,11 +300,11 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mouseup.
      */
     _stopDrag (event) {
-      const drag = document.querySelector('[dragging]')
+      const isDragging = document.querySelector('[dragging]')
 
-      if (drag) {
+      if (isDragging) {
         // Reset dragging status by setting it to draggable.
-        drag.setAttribute('draggable', '')
+        isDragging.setAttribute('draggable', '')
       }
     }
 
@@ -314,9 +314,9 @@ customElements.define('a-desktop-app',
      * @param {Event} event - mousemove.
      */
     _dragWindow (event) {
-      const drag = document.querySelector('[dragging]')
+      const draggedWindow = document.querySelector('[dragging]')
 
-      if (drag) {
+      if (draggedWindow) {
         event.preventDefault()
 
         // Find current mouse position in relation to the starting position.
@@ -324,13 +324,13 @@ customElements.define('a-desktop-app',
         const currentY = event.clientY - yPos
 
         // Change style for the new current position.
-        drag.style.left = `${currentX}px`
-        drag.style.top = `${currentY}px`
+        draggedWindow.style.left = `${currentX}px`
+        draggedWindow.style.top = `${currentY}px`
       }
     }
 
     /**
-     * Resets the app windows when leaving fullscreen.
+     * Resets the position of all app windows to the same position.
      */
     _resetWindows () {
       const windowApps = document.querySelectorAll('[draggable]')

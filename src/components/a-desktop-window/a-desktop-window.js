@@ -21,11 +21,6 @@ template.innerHTML = `
     border: 2px solid #404040;
     border-radius: 3px;
     background-color: #808080;
-/*
-    width: 'max-content';
-    height: 'max-content';
-*/    position: absolute;
-  /* Starting position */
     left: 30px;
     top: 10px;
     box-shadow: 5px 7px 15px #404040;
@@ -88,9 +83,6 @@ img {
     </slot>
     <div id="app">
         <slot name="an-application">Place an application here...</slot>
-    </div>
-    <div id="bottom">
-
     </div>
 </div>
 `

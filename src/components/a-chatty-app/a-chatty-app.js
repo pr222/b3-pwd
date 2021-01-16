@@ -5,9 +5,9 @@
  * @version 1.0.0
  */
 
-// const SOCKET = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
-let socket
 const KEY = 'eDBE76deU7L0H9mEBgxUKVR0VCnq0XBd'
+
+let socket
 
 /**
  * Define the HTML template
@@ -138,7 +138,6 @@ customElements.define('a-chatty-app',
       this._nameForm = this.shadowRoot.querySelector('#nameForm')
       this._name = this.shadowRoot.querySelector('#name')
       this._chatArea = this.shadowRoot.querySelector('#chat')
-      // this._upperBar = this.shadowRoot.querySelector('#upperBar')
       this._messageBox = this.shadowRoot.querySelector('#sentMessages')
       this._messageForm = this.shadowRoot.querySelector('#messageForm')
       this._writtenMessage = this.shadowRoot.querySelector('#writtenMessage')
@@ -156,11 +155,14 @@ customElements.define('a-chatty-app',
      * Called when the element has been insterted into the DOM.
      */
     connectedCallback () {
+      // Open up a new WebSocket for the chat.
       socket = new WebSocket('wss://cscloud6-127.lnu.se/socket/')
+
       // Check wether there are already a registered user.
-      // If not, start application with a name submit form.
+      // If not, apllication starts with a name submit form.
       this._checkForUser()
-      // Adding event listeners
+
+      // Add event listeners.
       socket.addEventListener('open', this._opendedSocket)
       socket.addEventListener('message', this._message)
       socket.addEventListener('error', this._error)
@@ -174,8 +176,10 @@ customElements.define('a-chatty-app',
      * Called when the element has been removed from the DOM.
      */
     disconnectedCallback () {
+      // Make sure to close WebSocket if not already closed.
       socket.close()
-      // Removing event listeners.
+
+      // Remove event listeners.
       socket.removeEventListener('open', this._opendedSocket)
       socket.removeEventListener('message', this._message)
       socket.removeEventListener('error', this._error)
@@ -270,7 +274,7 @@ customElements.define('a-chatty-app',
         // Empty the input field.
         this._name.value = ''
       } else {
-        // When not valid, reselect box with the changed input value.
+        // When not valid, reselect box with the relevant input value-message to user.
         this._name.focus()
         this._name.select()
       }
