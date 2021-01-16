@@ -28,6 +28,7 @@ template.innerHTML = `
   /* Starting position */
     left: 30px;
     top: 10px;
+    box-shadow: 5px 7px 15px #404040;
 }
 
 #topBar {

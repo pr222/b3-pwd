@@ -30,6 +30,20 @@ template.innerHTML = `
     max-height: calc(100vh - 90px);
 }
 
+#fullscreenButton {
+  border: none;
+  outline: none;
+  color: #546f54;
+  background-color: #8fbc8f;
+  padding: 15px;
+  margin: 15px;
+  float: right;
+}
+
+#fullscreenButton:active, #fullscreenButton:hover, #fullscreenButton:focus {
+    outline: 5px solid #d7d7d7;  
+}
+
 #dock {
     display: flex;
     justify-content: center;
@@ -73,7 +87,7 @@ template.innerHTML = `
 
 <div id="desktopWrapper">
     <div id="desktopArea">
-        <button type="button" id="fullscreenButton">Fullscreen</button>
+        <button type="button" id="fullscreenButton">Toggle fullscreen</button>
         <slot></slot>
     </div>
     <div id="dock">
