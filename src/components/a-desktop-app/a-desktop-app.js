@@ -23,7 +23,6 @@ template.innerHTML = `
     width: 100%;
     display: block;
     flex-direction: column;
-
 }
 
 #desktopArea {
@@ -36,7 +35,6 @@ template.innerHTML = `
     justify-content: center;
     background-color: #404040;
     padding: 5px;
-    z-index: 5000;
 }
 
 #tempButton {
@@ -98,6 +96,7 @@ customElements.define('a-desktop-app',
      */
     constructor () {
       super()
+      this._zIndexes = []
 
       // Attach shadow and append template.
       this.attachShadow({ mode: 'open' })
@@ -115,9 +114,11 @@ customElements.define('a-desktop-app',
       this._toggleFullscreen = this._toggleFullscreen.bind(this)
       this._fullscreenChanged = this._fullscreenChanged.bind(this)
       this._openApp = this._openApp.bind(this)
+      this._checkForWindow = this._checkForWindow.bind(this)
       this._startDrag = this._startDrag.bind(this)
       this._stopDrag = this._stopDrag.bind(this)
       this._dragWindow = this._dragWindow.bind(this)
+      this._bringForward = this._bringForward.bind(this)
     }
 
     /**
@@ -126,12 +127,14 @@ customElements.define('a-desktop-app',
     connectedCallback () {
       this._fullscreenButton.addEventListener('click', this._toggleFullscreen)
       document.addEventListener('fullscreenchange', this._fullscreenChanged)
+
       this._tempButton.addEventListener('click', this._openApp)
       this._memoryButton.addEventListener('click', this._openApp)
       this._chattyButton.addEventListener('click', this._openApp)
 
       this.addEventListener('closeWindow', this._closeApp)
 
+      this._desktopArea.addEventListener('click', this._checkForWindow)
       this._desktopArea.addEventListener('mousedown', this._startDrag)
       this._desktopArea.addEventListener('mousemove', this._dragWindow)
       this._desktopArea.addEventListener('mouseup', this._stopDrag)
@@ -143,12 +146,14 @@ customElements.define('a-desktop-app',
     disconnectedCallback () {
       this._fullscreenButton.removeEventListener('click', this._toggleFullscreen)
       document.removeEventListener('fullscreenchange', this._fullscreenChanged)
+
       this._tempButton.removeEventListener('click', this._openApp)
       this._memoryButton.removeEventListener('click', this._openApp)
       this._chattyButton.removeEventListener('click', this._openApp)
 
       this.removeEventListener('closeWindow', this._closeApp)
 
+      this._desktopArea.removeEventListener('click', this._checkForWindow)
       this._desktopArea.removeEventListener('startDrag', this._startDrag)
       this._desktopArea.removeEventListener('mousemove', this._dragWindow)
       this._desktopArea.removeEventListener('stopDrag', this._stopDrag)
@@ -165,7 +170,6 @@ customElements.define('a-desktop-app',
         if (this._desktopWrapper.requestFullscreen) {
           if (!document.fullscreenElement) {
             await this._desktopWrapper.requestFullscreen()
-            console.log('Entered fullscreen with base function')
           } else {
             document.exitFullscreen()
             this._resetWindows()
@@ -174,7 +178,6 @@ customElements.define('a-desktop-app',
         } else if (this._desktopWrapper.webkitRequestFullscreen) {
           if (!document.webkitFullscreenElement) {
             await this._desktopWrapper.webkitRequestFullscreen()
-            console.log('Entered fullscreen supported for Safari')
           } else {
             document.webkitExitFullscreen()
             this._resetWindows()
@@ -187,9 +190,9 @@ customElements.define('a-desktop-app',
 
     /**
      * Check if event changed from fullscreen,
-     * reset the app windows in that case.
+     * reset positions of the app windows in that case.
      *
-     * @param {Event} event - fullscreenchange
+     * @param {Event} event - on fullscreenchange
      */
     _fullscreenChanged (event) {
       if (!document.fullscreenElement) {
@@ -232,12 +235,27 @@ customElements.define('a-desktop-app',
     }
 
     /**
-     * Close a window.
+     * Close a window removing it from the DOM.
      *
      * @param {Event} event - a custom closeWindow event.
      */
     _closeApp (event) {
       this.removeChild(event.target)
+    }
+
+    /**
+     * Check if a desktop window was clicked and bring it forward.
+     *
+     * @param {Event} event - click
+     */
+    _checkForWindow (event) {
+      const desktopWindow = customElements.get('a-desktop-window')
+
+      if (event.target instanceof desktopWindow) {
+        this._bringForward(event.target)
+      } else if (event.target.parentElement instanceof desktopWindow) {
+        this._bringForward(event.target.parentElement)
+      }
     }
 
     /**
@@ -252,8 +270,11 @@ customElements.define('a-desktop-app',
       if (currentPath[0].id === 'topBar' || currentPath[0].id === 'appName') {
         // Set dragging attribute on the custom window-element.
         event.target.setAttribute('dragging', '')
-        console.log('START DRAG ON DESKTOP')
 
+        // Make sure it is brougth in front of other windows.
+        this._bringForward(event.target)
+
+        // Get the starting positions.
         xPos = event.clientX - event.target.style.left.slice(0, -2)
         yPos = event.clientY - event.target.style.top.slice(0, -2)
       }
@@ -268,7 +289,6 @@ customElements.define('a-desktop-app',
       const drag = document.querySelector('[dragging]')
 
       if (drag) {
-        console.log('STOP DRAG ON DESKTOP')
         // Reset dragging status by setting it to draggable.
         drag.setAttribute('draggable', '')
       }
@@ -285,9 +305,11 @@ customElements.define('a-desktop-app',
       if (drag) {
         event.preventDefault()
 
+        // Find current mouse position in relation to the starting position.
         const currentX = event.clientX - xPos
         const currentY = event.clientY - yPos
 
+        // Change style for the new current position.
         drag.style.left = `${currentX}px`
         drag.style.top = `${currentY}px`
       }
@@ -303,6 +325,22 @@ customElements.define('a-desktop-app',
         windowApp.style.left = '40px'
         windowApp.style.top = '10px'
       }
+    }
+
+    /**
+     * Bring an element forward.
+     *
+     * @param {HTMLElement} element - an element to bring forward.
+     */
+    _bringForward (element) {
+      // Increase the highest z-index assigned yet.
+      const z = this._zIndexes.length + 1
+
+      // Update length of already assigned z-indexes.
+      this._zIndexes.push(z)
+
+      // Add the new index to the element's style.
+      element.style.zIndex = z
     }
   }
 )
