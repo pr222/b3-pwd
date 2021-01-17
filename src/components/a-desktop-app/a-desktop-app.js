@@ -37,7 +37,8 @@ template.innerHTML = `
   background-color: #8fbc8f;
   padding: 15px;
   margin: 15px;
-  float: right;
+  position: absolute;
+  bottom: 8px;
 }
 
 #fullscreenButton:active, #fullscreenButton:hover, #fullscreenButton:focus {
