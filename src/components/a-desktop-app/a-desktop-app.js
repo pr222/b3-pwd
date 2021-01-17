@@ -223,8 +223,8 @@ customElements.define('a-desktop-app',
       let appName, appElement
 
       if (event.target.id === 'tempButton') {
-        appName = 'A Random App'
-        appElement = 'div'
+        appName = 'Dice Roller'
+        appElement = 'dice-roller-app'
       } else if (event.target.id === 'memoryButton') {
         appName = 'Memory Game'
         appElement = 'a-memory-game'

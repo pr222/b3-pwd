@@ -21,6 +21,7 @@ template.innerHTML = `
     border: 2px solid #404040;
     border-radius: 3px;
     background-color: #808080;
+    position: absolute;
     left: 30px;
     top: 10px;
     box-shadow: 5px 7px 15px #404040;
