@@ -68,6 +68,11 @@ template.innerHTML = `
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
             </select>
         </div>
 
@@ -171,21 +176,49 @@ customElements.define('dice-roller-app',
      */
     _renderDice (nrOfRolls, dicePool, die) {
       for (let i = 0; i < nrOfRolls; i++) {
+        // Create canvas to paint on and add to results area.
         const canvas = document.createElement('canvas')
         canvas.setAttribute('width', '150')
         canvas.setAttribute('height', '150')
         this._results.appendChild(canvas)
 
         const context = canvas.getContext('2d')
-        context.font = '20px Arial'
-        console.log(dicePool.allRolls[i])
-
-        if (die === 'd4') {
-            console.log('render a D4')
-        } else if (die === 'd6') {
-            console.log('Render a D6')
+        
+        // Determine the color of current die.
+        if (dicePool.allRolls[i] === dicePool.minResult) {
+            context.fillStyle = '#edd551'
+        } else if (dicePool.allRolls[i] === dicePool.maxResult) {
+            context.fillStyle = '#50a54b'
+        } else {
+            context.fillStyle = '#6caab8'
         }
-        context.fillText(`${dicePool.allRolls[i]}`, 10, 30)
+
+        const width = 150
+        const height = 150
+        let numberPosY, numberPosX
+
+        // Paint die shapes and set number positions.
+        if (die === 'd4') {
+            context.beginPath()
+            context.moveTo((width/2), (height/6))
+            context.lineTo(5*(width/6), 5*(height/6))
+            context.lineTo((width/6), 5*(height/6))
+            context.fill()
+
+            numberPosY = height/2
+            numberPosX = (width/2) - 5
+            context.font = '20px Arial'
+        } else if (die === 'd6') {
+            context.fillRect((width/8), (height/8), 6*(width/8), 6*(height/8))
+
+            numberPosY = height/2 + 15
+            numberPosX = (height/2) - 15
+            context.font = '50px Arial'
+        }
+
+        // Add the resulted number on to the die.
+        context.fillStyle = '#000000'
+        context.fillText(`${dicePool.allRolls[i]}`, numberPosX, numberPosY)
       }
     }
 
