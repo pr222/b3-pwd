@@ -7,7 +7,7 @@
 
 const memoryButton = (new URL('img/memory-app-button.png', import.meta.url)).href
 const chattyButton = (new URL('img/chatty-app-button.png', import.meta.url)).href
-const tempButton = (new URL('img/template-app-button.png', import.meta.url)).href
+const diceButton = (new URL('img/dice-app-button.png', import.meta.url)).href
 
 let xPos, yPos
 
@@ -52,8 +52,8 @@ template.innerHTML = `
     padding: 5px;
 }
 
-#tempButton {
-    background-image: url('${tempButton}');
+#diceButton {
+    background-image: url('${diceButton}');
 }
 
 #memoryButton {
@@ -92,7 +92,7 @@ template.innerHTML = `
         <slot></slot>
     </div>
     <div id="dock">
-        <button type="button" id="tempButton" class="dockIcon"></button>
+        <button type="button" id="diceButton" class="dockIcon"></button>
         <button type="button" id="memoryButton" class="dockIcon"></button>
         <button type="button" id="chattyButton" class="dockIcon"></button>
     </div>
@@ -120,7 +120,7 @@ customElements.define('a-desktop-app',
       // Select elements from shadow.
       this._fullscreenButton = this.shadowRoot.querySelector('#fullscreenButton')
       this._desktopWrapper = this.shadowRoot.querySelector('#desktopWrapper')
-      this._tempButton = this.shadowRoot.querySelector('#tempButton')
+      this._diceButton = this.shadowRoot.querySelector('#diceButton')
       this._memoryButton = this.shadowRoot.querySelector('#memoryButton')
       this._chattyButton = this.shadowRoot.querySelector('#chattyButton')
       this._desktopArea = this.shadowRoot.querySelector('#desktopArea')
@@ -143,7 +143,7 @@ customElements.define('a-desktop-app',
       this._fullscreenButton.addEventListener('click', this._toggleFullscreen)
       document.addEventListener('fullscreenchange', this._fullscreenChanged)
 
-      this._tempButton.addEventListener('click', this._openApp)
+      this._diceButton.addEventListener('click', this._openApp)
       this._memoryButton.addEventListener('click', this._openApp)
       this._chattyButton.addEventListener('click', this._openApp)
 
@@ -162,7 +162,7 @@ customElements.define('a-desktop-app',
       this._fullscreenButton.removeEventListener('click', this._toggleFullscreen)
       document.removeEventListener('fullscreenchange', this._fullscreenChanged)
 
-      this._tempButton.removeEventListener('click', this._openApp)
+      this._diceButton.removeEventListener('click', this._openApp)
       this._memoryButton.removeEventListener('click', this._openApp)
       this._chattyButton.removeEventListener('click', this._openApp)
 
@@ -223,7 +223,7 @@ customElements.define('a-desktop-app',
     _openApp (event) {
       let appName, appElement
 
-      if (event.target.id === 'tempButton') {
+      if (event.target.id === 'diceButton') {
         appName = 'Dice Roller'
         appElement = 'dice-roller-app'
       } else if (event.target.id === 'memoryButton') {
@@ -247,6 +247,8 @@ customElements.define('a-desktop-app',
       const app = document.createElement(`${appElement}`)
       app.setAttribute('slot', 'an-application')
       window.appendChild(app)
+
+      this._bringForward(window)
     }
 
     /**

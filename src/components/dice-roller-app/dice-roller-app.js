@@ -142,29 +142,40 @@ customElements.define('dice-roller-app',
 
       let totalResults = []
 
+      // Now roll and display all dice.
       if (d4s >= 1) {
         const groupD4 = rollGroupOfDice(4, d4s)
-        console.log(groupD4)
-        
         this._renderDice(d4s, groupD4, 'd4')
         totalResults.push(groupD4.totalResult)
       }
 
       if (d6s >= 1) {
         const groupD6 = rollGroupOfDice(6, d6s)
-        console.log(groupD6)
-        
         this._renderDice(d6s, groupD6, 'd6')
         totalResults.push(groupD6.totalResult)
       }
 
       totalResults = totalResults.reduce((a, b) => a + b, 0)
-      console.log(totalResults)
 
       // Only display results if any dice where rolled.
       if (totalResults >= 1) {
         this._renderTotalResult(totalResults)
-      } 
+      }
+    }
+
+    /**
+     * Create a canvas with custom width and height.
+     *
+     * @param {number} width - The width.
+     * @param {number} height - The height.
+     * @returns {HTMLElement} - a canvas element.
+     */
+    _createCanvas (width, height) {
+      const canvas = document.createElement('canvas')
+      canvas.setAttribute('width', `${width}`)
+      canvas.setAttribute('height', `${height}`)
+
+      return canvas
     }
 
     /**
@@ -176,44 +187,41 @@ customElements.define('dice-roller-app',
      */
     _renderDice (nrOfRolls, dicePool, die) {
       for (let i = 0; i < nrOfRolls; i++) {
-        // Create canvas to paint on and add to results area.
-        const canvas = document.createElement('canvas')
-        canvas.setAttribute('width', '150')
-        canvas.setAttribute('height', '150')
+        const canvas = this._createCanvas(150, 150)
         this._results.appendChild(canvas)
 
         const context = canvas.getContext('2d')
-        
+
+        const width = canvas.width
+        const height = canvas.height
+        let numberPosY, numberPosX
+
         // Determine the color of current die.
         if (dicePool.allRolls[i] === dicePool.minResult) {
-            context.fillStyle = '#edd551'
+          context.fillStyle = '#edd551'
         } else if (dicePool.allRolls[i] === dicePool.maxResult) {
-            context.fillStyle = '#50a54b'
+          context.fillStyle = '#50a54b'
         } else {
-            context.fillStyle = '#6caab8'
+          context.fillStyle = '#6caab8'
         }
-
-        const width = 150
-        const height = 150
-        let numberPosY, numberPosX
 
         // Paint die shapes and set number positions.
         if (die === 'd4') {
-            context.beginPath()
-            context.moveTo((width/2), (height/6))
-            context.lineTo(5*(width/6), 5*(height/6))
-            context.lineTo((width/6), 5*(height/6))
-            context.fill()
+          context.beginPath()
+          context.moveTo((width / 2), (height / 6))
+          context.lineTo(5 * (width / 6), 5 * (height / 6))
+          context.lineTo((width / 6), 5 * (height / 6))
+          context.fill()
 
-            numberPosY = height/2
-            numberPosX = (width/2) - 5
-            context.font = '20px Arial'
+          numberPosY = height / 2
+          numberPosX = (width / 2) - 5
+          context.font = '20px Arial'
         } else if (die === 'd6') {
-            context.fillRect((width/8), (height/8), 6*(width/8), 6*(height/8))
+          context.fillRect((width / 8), (height / 8), 6 * (width / 8), 6 * (height / 8))
 
-            numberPosY = height/2 + 15
-            numberPosX = (height/2) - 15
-            context.font = '50px Arial'
+          numberPosY = (height / 2) + 15
+          numberPosX = (height / 2) - 15
+          context.font = '50px Arial'
         }
 
         // Add the resulted number on to the die.
@@ -228,25 +236,24 @@ customElements.define('dice-roller-app',
      * @param {number} result - total result.
      */
     _renderTotalResult (result) {
-        const canvas = document.createElement('canvas')
-        canvas.setAttribute('width', '150')
-        canvas.setAttribute('height', '150')
-        this._results.appendChild(canvas)
-        
-        const context = canvas.getContext('2d')
-        const width = 150
-        const height = 150
+      const canvas = this._createCanvas(150, 150)
+      this._results.appendChild(canvas)
 
-        // Make a rectangle to present the results in.
-        context.fillStyle = '#CCCCCC'
-        context.fillRect(0, (height/4), width, (height/2))
+      const context = canvas.getContext('2d')
 
-        // Add text with the total results.
-        context.fillStyle = '#000000'
-        context.font = '20px Arial'
-        context.textAlign = 'center'
-        context.fillText('Total Results:', (width/2), (height/2))
-        context.fillText(`${result}`, (width/2), 2*(height/3))
+      const width = canvas.width
+      const height = canvas.height
+
+      // Make a rectangle to present the results in.
+      context.fillStyle = '#CCCCCC'
+      context.fillRect(0, (height / 4), width, (height / 2))
+
+      // Add text with the total results.
+      context.fillStyle = '#000000'
+      context.font = '20px Arial'
+      context.textAlign = 'center'
+      context.fillText('Total Results:', (width / 2), (height / 2))
+      context.fillText(`${result}`, (width / 2), 2 * (height / 3))
     }
   }
 )
